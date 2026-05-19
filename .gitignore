@@ -19,6 +19,7 @@ tensorboard/
 checkpoints/*
 !checkpoints/.gitkeep
 *.ckpt
+!checkpoints/FireDrive_riskattn64_single_gpu-915.ckpt
 *.pth
 *.pt
 
