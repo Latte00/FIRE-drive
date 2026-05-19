@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CKPT="${CKPT:-checkpoints/best_pdm_riskattn.ckpt}"
+CKPT="${CKPT:-checkpoints/FireDrive_riskattn64_single_gpu-915.ckpt}"
 
 python navsim/planning/script/run_pdm_score.py \
   train_test_split=navtest \
