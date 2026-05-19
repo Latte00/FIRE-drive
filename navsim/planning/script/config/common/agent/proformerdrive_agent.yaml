@@ -1,0 +1,73 @@
+_target_: navsim.agents.proformerdrive.transfuser_agent.ProFormerDriveAgent
+_convert_: 'all'
+
+config:
+  _target_: navsim.agents.proformerdrive.transfuser_config.ProFormerDriveConfig
+  _convert_: 'all'
+
+  trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+
+  latent: False
+  trajectory_decoder_type: proformer
+  proformer_four_camera_input: true
+  proformer_ref_num: 4
+  proformer_share_refiner_params: true
+  proformer_expand_proposal_tokens: true
+  proformer_bev_refine_enable: true
+  proformer_bev_refine_pool_hw: [16, 16]
+  proformer_bev_refine_scale: 1.0
+  proformer_use_risk_feedback: true
+  proformer_detach_proposal_ref: true
+  proformer_pure_visual_mode: true
+  proformer_use_global_bev: true
+  proformer_disable_actor_query: true
+  proformer_risk_feedback_prev_only: true
+  proformer_risk_feedback_detach: true
+  proformer_status_fuse_pre_loop: true
+  proformer_risk_attention_grid_height: 32
+  proformer_risk_attention_grid_width: 64
+  proformer_risk_attention_use_risk_bias: false
+  proformer_risk_aux_enable: true
+  proformer_risk_aux_weight: 0.2
+  proformer_risk_aux_scalar_weight: 1.0
+  proformer_risk_aux_heatmap_weight: 0.05
+  proformer_risk_collision_mode: front
+  proformer_trajectory_loss_reduce: ipad
+  proformer_trajectory_prev_weight: 0.1
+  proformer_trajectory_loss_normalize: false
+  bev_features_channels: 256
+  self_elite_pseudo_enable: false
+  self_elite_pseudo_weight: 0.0
+  self_elite_pseudo_margin: 0.02
+  self_elite_pseudo_max_pairs_per_sample: 1
+  self_elite_pseudo_component_gate: true
+  agent_class_weight: 0.0
+  agent_box_weight: 0.0
+  bev_semantic_weight: 0.0
+  bev_centerline_aux_weight: 0.0
+  bev_drivable_aux_weight: 0.0
+  anchor_use_feasible_area_mask: false
+  denoise_use_lidar_tokens: false
+  pdm_score_use_lidar_tokens: false
+  bev_loss_logit_guard_enable: true
+  loss_nonfinite_guard_enable: true
+  loss_debug_log_enable: true
+  loss_debug_log_every_n_steps: 20
+  loss_debug_max_tensors: 32
+  proformer_backbone_nan_guard: true
+  proformer_internal_debug_tensors: true
+  xqf_pad_encoder_enable: true
+  xqf_pad_image_fpn_enable: true
+  xqf_v2_camera_only_backbone: true
+  xqf_pad_encoder_num_cams: 4
+  xqf_pad_projection_nan_guard: true
+  refine_enable: false
+  trajectory_cls_weight: 0.0
+  trajectory_candidate_cls_weight: 0.0
+
+checkpoint_path: null
+lr: 2e-4

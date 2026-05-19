@@ -1,0 +1,243 @@
+hydra:
+  run:
+    dir: ${output_dir}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+    params: null
+  help:
+    app_name: ${hydra.job.name}
+    header: '${hydra.help.app_name} is powered by Hydra.
+
+      '
+    footer: 'Powered by Hydra (https://hydra.cc)
+
+      Use --hydra-help to view Hydra specific help
+
+      '
+    template: '${hydra.help.header}
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (group=option)
+
+
+      $APP_CONFIG_GROUPS
+
+
+      == Config ==
+
+      Override anything in the config (foo.bar=value)
+
+
+      $CONFIG
+
+
+      ${hydra.help.footer}
+
+      '
+  hydra_help:
+    template: 'Hydra (${hydra.runtime.version})
+
+      See https://hydra.cc for more info.
+
+
+      == Flags ==
+
+      $FLAGS_HELP
+
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (For example, append hydra/job_logging=disabled
+      to command line)
+
+
+      $HYDRA_CONFIG_GROUPS
+
+
+      Use ''--cfg hydra'' to Show the Hydra config.
+
+      '
+    hydra_help: ???
+  hydra_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][HYDRA] %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+    root:
+      level: INFO
+      handlers:
+      - console
+    loggers:
+      logging_example:
+        level: DEBUG
+    disable_existing_loggers: false
+  job_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][%(name)s][%(levelname)s] - %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+      file:
+        class: logging.FileHandler
+        formatter: simple
+        filename: ${hydra.runtime.output_dir}/${hydra.job.name}.log
+    root:
+      level: INFO
+      handlers:
+      - console
+      - file
+    disable_existing_loggers: false
+  env: {}
+  mode: RUN
+  searchpath:
+  - pkg://navsim.planning.script.config.common
+  callbacks: {}
+  output_subdir: ${output_dir}/code/hydra
+  overrides:
+    hydra:
+    - hydra.mode=RUN
+    task:
+    - agent=diffusiondrive_agent
+    - experiment_name=pdm_online_drivor_style_riskattn
+    - train_test_split=navtrain
+    - split=trainval
+    - cache_path=/home2/xqf/DiffusionDrive-main/exp/training_cache
+    - use_cache_without_dataset=true
+    - force_cache_computation=false
+    - agent.checkpoint_path=null
+    - +agent.config.pdm_metric_cache_path=/home2/xqf/DiffusionDrive-main/exp/metric_cache_train
+    - +agent.config.pdm_score_use_head=true
+    - +agent.config.pdm_score_use_components=true
+    - +agent.config.pdm_score_weight=1.5
+    - +agent.config.pdm_score_head_only=false
+    - +agent.config.pdm_score_use_offline_targets=false
+    - +agent.config.pdm_score_train_only=false
+    - +agent.config.pdm_score_use_ray=true
+    - +agent.config.pdm_score_ray_threads=32
+    - +agent.config.pdm_score_topk=0
+    - +agent.config.pdm_val_use_online_score=true
+    - +agent.config.pdm_val_score_topk=0
+    - +agent.config.pdm_score_component_kl_weight=0.0
+    - +agent.config.pdm_score_component_bce_weight=1.0
+    - +agent.config.checkpoint_monitor=monitor/score/dataloader_idx_1
+    - +agent.config.checkpoint_mode=max
+    - +agent.config.checkpoint_filename=best_pdm_riskattn
+    - scorer_cache_require=false
+    - trainer.params.strategy=auto
+    - +trainer.params.devices=1
+    - monitor_enable=true
+    - monitor_use_test_logs=true
+    - +agent.config.pdm_val_skip_primary_loader=true
+    - +agent.config.inference_multisample_enable=false
+    - +agent.config.inference_dedup_enable=false
+    - +agent.config.inference_pdm_postprocess_enable=false
+    - +agent.config.pdm_val_metrics_use_inference_forward=true
+    - +agent.config.pdm_val_score_use_selected_trajectory=true
+    - +agent.config.pdm_score_use_for_selection=true
+    - +agent.config.refine_enable=true
+    - +agent.config.refine_steps=1
+    - +agent.config.refine_hidden_dim=256
+    - +agent.config.refine_use_ego_context=true
+    - +agent.config.refine_delta_clip_xy=1.0
+    - +agent.config.refine_delta_clip_heading=0.1
+    - +agent.config.refine_aux_loss_weight=0.1
+    - +agent.config.refine_aux_gt_weight=1.0
+    - +agent.config.refine_aux_candidate_weight=1.0
+    - +agent.config.refine_aux_use_candidates=true
+    - +agent.config.refine_aux_candidate_use_score_filter=true
+    - monitor_schedule.enable=true
+    - trainer.params.max_epochs=60
+    - monitor_schedule.switch_epoch=25
+    - monitor_schedule.every_n_epoch_before=8
+    - monitor_schedule.every_n_epoch_after=1
+    - +agent.config.denoise_use_ego_query=false
+    - +agent.config.denoise_use_history_tokens=false
+    - +agent.config.diff_decoder_layers=2
+    - +agent.config.mode_bev_attention_enable=true
+    - +agent.config.mode_bev_attention_use_refine=false
+    - +agent.config.mode_bev_attention_use_scorer=true
+    - +agent.config.mode_bev_attention_use_scorer_post=false
+    - +agent.config.mode_bev_attention_use_scorer_pre=true
+    - +agent.config.mode_bev_attention_recompute_after_refine=false
+    - +agent.config.mode_bev_attention_aux_enable=true
+    - +agent.config.mode_bev_attention_aux_weight=0.1
+    - +agent.config.mode_bev_attention_aux_sigma_px=2.0
+    - +agent.config.mode_bev_attention_aux_time_decay_enable=true
+    - +agent.config.mode_bev_attention_aux_time_decay_tau_s=2.0
+    - +agent.config.mode_bev_attention_aux_time_decay_min=0.1
+    - +agent.config.mode_bev_attention_risk_enable=true
+    - +agent.config.mode_bev_attention_risk_use_target_in_train=true
+    - +agent.config.mode_bev_attention_risk_bias_weight=2.0
+    - +agent.config.mode_bev_attention_risk_offroad_weight=1.0
+    - +agent.config.mode_bev_attention_risk_obstacle_weight=0.5
+    - +agent.config.mode_bev_attention_risk_include_pedestrian=true
+    - +agent.config.pdm_score_output_infraction_details=true
+    - +agent.config.pdm_score_output_infraction_in_train=true
+    - +agent.config.pdm_score_output_infraction_in_val=true
+    - +agent.config.ego_fut_mode=64
+    - +agent.config.pdm_score_progress_use_reference_baseline=true
+    - dataloader.params.batch_size=32
+    - trainer.params.accumulate_grad_batches=2
+  job:
+    name: run_training_full
+    chdir: false
+    override_dirname: +agent.config.checkpoint_filename=best_pdm_riskattn,+agent.config.checkpoint_mode=max,+agent.config.checkpoint_monitor=monitor/score/dataloader_idx_1,+agent.config.denoise_use_ego_query=false,+agent.config.denoise_use_history_tokens=false,+agent.config.diff_decoder_layers=2,+agent.config.ego_fut_mode=64,+agent.config.inference_dedup_enable=false,+agent.config.inference_multisample_enable=false,+agent.config.inference_pdm_postprocess_enable=false,+agent.config.mode_bev_attention_aux_enable=true,+agent.config.mode_bev_attention_aux_sigma_px=2.0,+agent.config.mode_bev_attention_aux_time_decay_enable=true,+agent.config.mode_bev_attention_aux_time_decay_min=0.1,+agent.config.mode_bev_attention_aux_time_decay_tau_s=2.0,+agent.config.mode_bev_attention_aux_weight=0.1,+agent.config.mode_bev_attention_enable=true,+agent.config.mode_bev_attention_recompute_after_refine=false,+agent.config.mode_bev_attention_risk_bias_weight=2.0,+agent.config.mode_bev_attention_risk_enable=true,+agent.config.mode_bev_attention_risk_include_pedestrian=true,+agent.config.mode_bev_attention_risk_obstacle_weight=0.5,+agent.config.mode_bev_attention_risk_offroad_weight=1.0,+agent.config.mode_bev_attention_risk_use_target_in_train=true,+agent.config.mode_bev_attention_use_refine=false,+agent.config.mode_bev_attention_use_scorer=true,+agent.config.mode_bev_attention_use_scorer_post=false,+agent.config.mode_bev_attention_use_scorer_pre=true,+agent.config.pdm_metric_cache_path=/home2/xqf/DiffusionDrive-main/exp/metric_cache_train,+agent.config.pdm_score_component_bce_weight=1.0,+agent.config.pdm_score_component_kl_weight=0.0,+agent.config.pdm_score_head_only=false,+agent.config.pdm_score_output_infraction_details=true,+agent.config.pdm_score_output_infraction_in_train=true,+agent.config.pdm_score_output_infraction_in_val=true,+agent.config.pdm_score_progress_use_reference_baseline=true,+agent.config.pdm_score_ray_threads=32,+agent.config.pdm_score_topk=0,+agent.config.pdm_score_train_only=false,+agent.config.pdm_score_use_components=true,+agent.config.pdm_score_use_for_selection=true,+agent.config.pdm_score_use_head=true,+agent.config.pdm_score_use_offline_targets=false,+agent.config.pdm_score_use_ray=true,+agent.config.pdm_score_weight=1.5,+agent.config.pdm_val_metrics_use_inference_forward=true,+agent.config.pdm_val_score_topk=0,+agent.config.pdm_val_score_use_selected_trajectory=true,+agent.config.pdm_val_skip_primary_loader=true,+agent.config.pdm_val_use_online_score=true,+agent.config.refine_aux_candidate_use_score_filter=true,+agent.config.refine_aux_candidate_weight=1.0,+agent.config.refine_aux_gt_weight=1.0,+agent.config.refine_aux_loss_weight=0.1,+agent.config.refine_aux_use_candidates=true,+agent.config.refine_delta_clip_heading=0.1,+agent.config.refine_delta_clip_xy=1.0,+agent.config.refine_enable=true,+agent.config.refine_hidden_dim=256,+agent.config.refine_steps=1,+agent.config.refine_use_ego_context=true,+trainer.params.devices=1,agent.checkpoint_path=null,agent=diffusiondrive_agent,cache_path=/home2/xqf/DiffusionDrive-main/exp/training_cache,dataloader.params.batch_size=32,experiment_name=pdm_online_drivor_style_riskattn,force_cache_computation=false,monitor_enable=true,monitor_schedule.enable=true,monitor_schedule.every_n_epoch_after=1,monitor_schedule.every_n_epoch_before=8,monitor_schedule.switch_epoch=25,monitor_use_test_logs=true,scorer_cache_require=false,split=trainval,train_test_split=navtrain,trainer.params.accumulate_grad_batches=2,trainer.params.max_epochs=60,trainer.params.strategy=auto,use_cache_without_dataset=true
+    id: ???
+    num: ???
+    config_name: default_training
+    env_set: {}
+    env_copy: []
+    config:
+      override_dirname:
+        kv_sep: '='
+        item_sep: ','
+        exclude_keys: []
+  runtime:
+    version: 1.2.0
+    version_base: '1.2'
+    cwd: /home2/xqf/DiffusionDrive-main
+    config_sources:
+    - path: hydra.conf
+      schema: pkg
+      provider: hydra
+    - path: /home2/xqf/DiffusionDrive-main/navsim/planning/script/config/training
+      schema: file
+      provider: main
+    - path: navsim.planning.script.config.common
+      schema: pkg
+      provider: hydra.searchpath in main
+    - path: ''
+      schema: structured
+      provider: schema
+    output_dir: /home2/xqf/DiffusionDrive-main/exp/pdm_online_drivor_style_riskattn/2026.04.18.11.39.54
+    choices:
+      agent: diffusiondrive_agent
+      worker: ray_distributed_no_torch
+      train_test_split: navtrain
+      train_test_split/scene_filter: navtrain
+      hydra/env: default
+      hydra/callbacks: null
+      hydra/job_logging: default
+      hydra/hydra_logging: default
+      hydra/hydra_help: default
+      hydra/help: default
+      hydra/sweeper: basic
+      hydra/launcher: basic
+      hydra/output: default
+  verbose: false

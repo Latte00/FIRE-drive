@@ -1,0 +1,106 @@
+hydra:
+  run:
+    dir: ${output_dir}
+  output_subdir: ${output_dir}/code/hydra
+  searchpath:
+    - pkg://navsim.planning.script.config.common
+  job:
+    chdir: false
+
+defaults:
+  - default_common
+  - default_evaluation
+  - default_train_val_test_log_split
+  - agent: diffusiondrive_agent
+  - override /train_test_split: navmini
+  - _self_
+
+experiment_name: b2d_candidate_scorer_training
+split: trainval
+
+cache_path: ${oc.env:B2D_DIFFUSIONDRIVE_CACHE,/home2/xqf/cache/b2d_diffusiondrive_cache_route_lattice}
+use_cache_without_dataset: true
+force_cache_computation: false
+scorer_cache_path: null
+scorer_cache_filename: scorer_cache.gz
+scorer_cache_require: false
+scorer_cache_use_train_mode: false
+scorer_cache_force_train_forward: false
+seed: 0
+
+train_logs:
+  - train
+val_logs:
+  - val
+test_logs: []
+
+monitor_enable: false
+monitor_use_test_logs: false
+monitor_logs: []
+monitor_schedule:
+  enable: false
+  switch_epoch: 50
+  every_n_epoch_before: 1
+  every_n_epoch_after: 1
+
+dataloader:
+  params:
+    batch_size: 4
+    num_workers: 4
+    pin_memory: false
+    prefetch_factor: 2
+
+trainer:
+  params:
+    max_epochs: 10
+    check_val_every_n_epoch: 1
+    val_check_interval: 1.0
+    limit_train_batches: 1.0
+    limit_val_batches: 1.0
+    accelerator: gpu
+    strategy: auto
+    precision: 16-mixed
+    num_nodes: 1
+    devices: 1
+    num_sanity_val_steps: 0
+    fast_dev_run: false
+    accumulate_grad_batches: 1
+    gradient_clip_val: 2.0
+    gradient_clip_algorithm: norm
+    default_root_dir: ${output_dir}
+    ckpt_path: null
+
+agent:
+  checkpoint_path: null
+  config:
+    trajectory_sampling:
+      time_horizon: 3
+      interval_length: 0.5
+
+    trajectory_candidate_weight: 0.2
+    trajectory_candidate_cls_weight: 0.0
+    trajectory_candidate_exclude_gt_mode: true
+    refine_aux_loss_weight: 0.05
+    refine_aux_use_candidates: true
+    refine_aux_candidate_use_score_filter: false
+    anchor_learned_gaussian_candidate_use_score_filter: false
+
+    pdm_score_weight: 0.05
+    pdm_score_use_head: true
+    pdm_score_use_for_selection: false
+    pdm_score_use_components: true
+    pdm_score_use_offline_targets: false
+    pdm_score_component_kl_weight: 1.0
+    pdm_score_component_bce_weight: 0.0
+    pdm_score_pairwise_weight: 0.5
+    pdm_val_use_online_score: false
+    b2d_pdm_score_enable: true
+    b2d_pdm_wrong_lane_cos_threshold: 0.0
+    grpo_enable: false
+
+    checkpoint_monitor: val/b2d_pseudo_selected_score_epoch
+    checkpoint_mode: max
+    checkpoint_filename: best_b2d_pseudo_selected
+
+    mode_bev_attention_enable: false
+    mode_bev_attention_aux_enable: false
