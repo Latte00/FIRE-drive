@@ -1,0 +1,24 @@
+hydra:
+  run:
+    dir: ${output_dir}
+  output_subdir: ${output_dir}/code/hydra           # Store hydra's config breakdown here for debugging
+  searchpath:                                       # Only <exp_dir> in these paths are discoverable
+    - pkg://navsim.planning.script.config.common 
+  job:
+    chdir: False
+
+defaults:
+  - default_common
+  - default_evaluation
+  - default_scoring_parameters
+  - agent: constant_velocity_agent
+  - _self_
+  - override train_test_split: navtest
+
+metric_cache_path: ${oc.env:NAVSIM_EXP_ROOT}/metric_cache # path to metric cache
+training_cache_path: null # optional training cache root used to load cached features/targets for faster navtrain evaluation
+prefer_training_cache: false # when true, prefer training cache for token enumeration and per-token model inference
+record_hardcase_metrics: false # include agent-provided hc_* metrics in pdm_score csv
+record_bev_loss_metrics: false # compute per-token BEV CE (hc_bev_ce) by running an extra forward with GT BEV target
+record_attention_loss_metrics: false # compute per-token attention aux loss (hc_attn_aux) from an extra forward + oracle infraction details
+record_mode_oracle_metrics: false # compute per-token oracle rank/score for the selected mode from proposal-level PDM validation
