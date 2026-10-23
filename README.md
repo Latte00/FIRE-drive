@@ -28,7 +28,7 @@ This project is based on the official DiffusionDrive baseline:
 
 ## Benchmark
 
-NAVSIM benchmark results:
+### NAVSIM
 
 | Method | Backbone | NC↑ | DAC↑ | EP↑ | TTC↑ | C↑ | PDMS↑ |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -51,6 +51,32 @@ NAVSIM benchmark results:
 | Hydra-MDP++ (2025) | V2-99 | 98.6 | 98.6 | 85.7 | 95.1 | 100 | 91.0 |
 | VADv2 (2026) | BEVFormer | 98.3 | 97.4 | 82.3 | 95.7 | 100 | 89.3 |
 | Human Agent | - | 100 | 100 | 87.5 | 100 | 99.9 | 94.8 |
+
+### Bench2Drive
+
+Reported closed-loop results from Table II of our paper. FIRE-Drive is evaluated
+on 220 routes in CARLA 0.9.15. DS is Driving Score and SR is Success Rate;
+higher is better. Best and second-best results are bolded and underlined.
+
+| Method | Year | DS | SR (%) |
+| --- | --- | ---: | ---: |
+| UniAD-Base | 2023 | 45.81 | 16.36 |
+| VAD | 2023 | 42.35 | 15.00 |
+| DriveAdapter | 2023 | 64.22 | 33.08 |
+| MomAD (SD) | 2025 | 47.91 | 18.11 |
+| WoTE | 2025 | 61.71 | 31.36 |
+| DriveTransformer-L | 2025 | 63.46 | 35.01 |
+| DIVER | 2025 | 68.90 | 36.75 |
+| SafeDrive | 2026 | 66.77 | <ins>42.40</ins> |
+| Diffusion-Phy | 2026 | 67.49 | 36.51 |
+| SoAD | 2026 | <ins>70.47</ins> | 41.36 |
+| **FIRE-Drive (Ours)** | **2026** | **71.43** | **42.73** |
+
+SD denotes the SparseDrive-based MomAD variant. DIVER uses its highest-DS
+configuration (arXiv v3, Table I); SoAD includes safety creeping. Other methods
+are literature results. Training data, sensor/navigation inputs, and auxiliary
+supervision differ across methods: these are system-level comparisons, not
+matched retrainings. See [B2D instructions](docs/b2d.md) for training and inference.
 
 ## Setup
 
