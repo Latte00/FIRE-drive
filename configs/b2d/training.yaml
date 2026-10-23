@@ -1,0 +1,186 @@
+train_test_split:
+  scene_filter:
+    _target_: navsim.common.dataclasses.SceneFilter
+    _convert_: all
+    num_history_frames: 4
+    num_future_frames: 10
+    frame_interval: null
+    has_route: true
+    max_scenes: null
+    log_names: null
+    tokens: null
+  data_split: mini
+worker:
+  _target_: navsim.planning.utils.multithreading.worker_ray_no_torch.RayDistributedNoTorch
+  _convert_: all
+  master_node_ip: null
+  threads_per_node: null
+  debug_mode: false
+  log_to_driver: true
+  logs_subdir: logs
+  use_distributed: false
+distributed_timeout_seconds: 7200
+selected_simulation_metrics: null
+verbose: false
+logger_level: info
+logger_format_string: null
+max_number_of_workers: null
+gpu: true
+experiment_name: firedrive_b2d_navigation
+navsim_log_path: null
+sensor_blobs_path: null
+date_format: '%Y.%m.%d.%H.%M.%S'
+experiment_uid: ${now:${date_format}}
+output_dir: ${oc.env:NAVSIM_EXP_ROOT,outputs}/${experiment_name}/${experiment_uid}
+train_logs:
+- train
+val_logs:
+- val
+test_logs: []
+agent:
+  _target_: navsim.agents.diffusiondrive.transfuser_agent.TransfuserAgent
+  _convert_: all
+  config:
+    _target_: navsim.agents.diffusiondrive.transfuser_config.TransfuserConfig
+    _convert_: all
+    trajectory_sampling:
+      _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+      _convert_: all
+      time_horizon: 3
+      interval_length: 0.5
+    latent: false
+    trajectory_candidate_weight: 0.0
+    trajectory_candidate_cls_weight: 0.0
+    trajectory_candidate_exclude_gt_mode: true
+    refine_aux_loss_weight: 0.1
+    refine_aux_use_candidates: true
+    refine_aux_candidate_use_score_filter: true
+    anchor_learned_gaussian_candidate_use_score_filter: false
+    pdm_score_weight: 1.5
+    pdm_score_use_head: true
+    pdm_score_use_for_selection: true
+    pdm_score_use_components: true
+    pdm_score_use_offline_targets: false
+    pdm_score_component_kl_weight: 0.0
+    pdm_score_component_bce_weight: 1.0
+    pdm_score_pairwise_weight: 1.0
+    pdm_val_use_online_score: false
+    b2d_pdm_score_enable: true
+    b2d_pdm_wrong_lane_cos_threshold: 0.0
+    grpo_enable: false
+    checkpoint_monitor: val/b2d_pseudo_selected_score_epoch
+    checkpoint_mode: max
+    checkpoint_filename: best_b2d_firedrive_navigation
+    mode_bev_attention_enable: true
+    mode_bev_attention_aux_enable: true
+    refine_enable: true
+    refine_steps: 1
+    refine_hidden_dim: 256
+    refine_use_ego_context: true
+    refine_delta_clip_xy: 1.0
+    refine_delta_clip_heading: 0.1
+    refine_aux_gt_weight: 1.0
+    refine_aux_candidate_weight: 1.0
+    anchor_learned_gaussian_enable: true
+    anchor_learned_gaussian_nll_weight: 0.2
+    anchor_learned_gaussian_reg_weight: 1.0
+    anchor_learned_gaussian_candidate_weight: 0.2
+    pdm_score_head_only: false
+    b2d_pdm_wrong_lane_allowed_floor: 0.85
+    checkpoint_save_last: true
+    denoise_use_ego_query: false
+    denoise_use_history_tokens: false
+    diff_decoder_layers: 2
+    mode_bev_attention_use_refine: false
+    mode_bev_attention_use_scorer: true
+    mode_bev_attention_use_scorer_post: false
+    mode_bev_attention_use_scorer_pre: true
+    mode_bev_attention_aux_weight: 0.1
+    mode_bev_attention_aux_sigma_px: 2.0
+    mode_bev_attention_aux_time_decay_enable: true
+    mode_bev_attention_aux_time_decay_tau_s: 2.0
+    mode_bev_attention_aux_time_decay_min: 0.1
+    mode_bev_attention_risk_enable: true
+    mode_bev_attention_risk_use_target_in_train: true
+    mode_bev_attention_risk_bias_weight: 2.0
+    mode_bev_attention_risk_offroad_weight: 1.0
+    mode_bev_attention_risk_obstacle_weight: 0.5
+    mode_bev_attention_risk_include_pedestrian: true
+    mode_bev_attention_risk_include_static: true
+    mode_bev_attention_risk_static_weight: 0.5
+    pdm_score_output_infraction_details: true
+    pdm_score_output_infraction_in_train: true
+    pdm_score_output_infraction_in_val: true
+    ego_fut_mode: 64
+    loss_nonfinite_guard_enable: true
+    bev_loss_logit_guard_enable: true
+    b2d_navigation_enable: true
+    b2d_navigation_require_features: true
+    b2d_navigation_fuse_scale: 1.0
+    b2d_navigation_near_scale_m: 30.0
+    b2d_navigation_far_scale_m: 80.0
+    b2d_navigation_clip: 2.0
+    b2d_navigation_gate_bias: 1.0
+    b2d_navigation_ignore_behind_enable: false
+    b2d_navigation_near_behind_tolerance_m: 1.0
+    b2d_navigation_far_behind_tolerance_m: 3.0
+    bkb_path: assets/resnet34.a1_in1k/pytorch_model.bin
+    plan_anchor_path: assets/kmeans_navsim_traj_20.npy
+    pdm_metric_cache_path: null
+    pdm_metric_cache_path_monitor: null
+  checkpoint_path: null
+  lr: 0.0002
+split: trainval
+cache_path: ${oc.env:B2D_CACHE_ROOT,cache/b2d}
+use_cache_without_dataset: true
+force_cache_computation: false
+scorer_cache_path: null
+scorer_cache_filename: scorer_cache.gz
+scorer_cache_require: false
+scorer_cache_use_train_mode: false
+scorer_cache_force_train_forward: false
+seed: 0
+monitor_enable: false
+monitor_use_test_logs: false
+monitor_logs: []
+monitor_schedule:
+  enable: false
+  switch_epoch: 50
+  every_n_epoch_before: 1
+  every_n_epoch_after: 1
+dataloader:
+  params:
+    batch_size: 32
+    num_workers: 4
+    pin_memory: false
+    prefetch_factor: 2
+trainer:
+  params:
+    max_epochs: 60
+    check_val_every_n_epoch: 1
+    val_check_interval: 1.0
+    limit_train_batches: 1.0
+    limit_val_batches: 1.0
+    accelerator: gpu
+    strategy: auto
+    precision: 32-true
+    num_nodes: 1
+    devices: 1
+    num_sanity_val_steps: 0
+    fast_dev_run: false
+    accumulate_grad_batches: 2
+    gradient_clip_val: 2.0
+    gradient_clip_algorithm: norm
+    default_root_dir: ${output_dir}
+    ckpt_path: null
+cache_validate: true
+cache_validation_max_attempts: 32
+cache_validation_max_trajectory_translation: 120.0
+cache_validation_max_trajectory_step: 60.0
+cache_validation_max_status_abs: 100.0
+hydra:
+  run:
+    dir: ${output_dir}
+  job:
+    chdir: false
+  output_subdir: config

@@ -164,7 +164,9 @@ class V2TransfuserModel(nn.Module):
         self._bev_downscale = nn.Conv2d(
             self._backbone.num_lidar_features, config.tf_d_model, kernel_size=1
         )
-        self._status_encoding = nn.Linear(4 + 2 + 2, config.tf_d_model)   
+        self._status_encoding = nn.Linear(4 + 2 + 2, config.tf_d_model)
+        from navsim.agents.diffusiondrive.b2d_navigation import initialize_navigation
+        initialize_navigation(self, config)
         self._ego_history_encoder = None
         if config.include_ego_history:
             self._ego_history_encoder = nn.GRU(
@@ -304,6 +306,10 @@ class V2TransfuserModel(nn.Module):
         # 3. 对BEV特征进行编码，构建key-value和query
         bev_feature = bev_feature.permute(0, 2, 1)
         status_encoding = self._status_encoding(status_feature)
+        if bool(getattr(self._config, 'b2d_navigation_enable', False)):
+            from navsim.agents.diffusiondrive.b2d_navigation import encode_navigation
+            navigation = encode_navigation(self, features, status_encoding)
+            status_encoding = status_encoding + self._config.b2d_navigation_fuse_scale * navigation
         history_tokens = None
         history_state_last = None
         ego_history = None

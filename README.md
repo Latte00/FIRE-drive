@@ -100,3 +100,8 @@ Windows PowerShell:
 ```
 
 If `assets/resnet34.a1_in1k/pytorch_model.bin` is absent, the copied backbone initializes with `pretrained=False`; loading the FIRE-drive checkpoint supplies the trained weights.
+
+## Bench2Drive
+
+Navigation-conditioned B2D inference and training: [instructions](docs/b2d.md).
+The B2D checkpoint is `checkpoints/firedrive_b2d_navigation.ckpt` (Git LFS).

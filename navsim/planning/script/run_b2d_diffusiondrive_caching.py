@@ -1092,6 +1092,19 @@ def command_point_local(info: Dict[str, object], key: str) -> Optional[np.ndarra
     return local[0].astype(np.float32)
 
 
+def build_navigation_features(info: Dict[str, object]) -> Dict[str, torch.Tensor]:
+    """Build B2D route target points in DiffusionDrive (front, left) coordinates."""
+    payload: Dict[str, torch.Tensor] = {}
+    for output_key, info_key in (("tp_near", "command_near_xy"), ("tp_far", "command_far_xy")):
+        point = command_point_local(info, info_key)
+        valid = point is not None
+        if point is None:
+            point = np.zeros((2,), dtype=np.float32)
+        payload[output_key] = torch.from_numpy(np.asarray(point, dtype=np.float32).reshape(2))
+        payload[f"{output_key}_valid"] = torch.tensor(valid, dtype=torch.bool)
+    return payload
+
+
 def select_route_centerline(
     info: Dict[str, object],
     map_infos: Dict[str, object],
@@ -1440,6 +1453,7 @@ def build_cache_entry(
             history_frames=args.history_frames,
         ),
     }
+    features.update(build_navigation_features(info))
     targets: Dict[str, object] = {
         "trajectory": trajectory,
         "agent_states": agent_states,
@@ -1666,13 +1680,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--camera-side-crop-ratio",
         type=float,
-        default=192.0 / 1024.0,
+        default=0.30,
         help="Width ratio kept from CAM_FRONT_LEFT/RIGHT when camera-stitch-mode is not front_only.",
     )
     parser.add_argument(
         "--camera-side-overlap-ratio",
         type=float,
-        default=192.0 / 1024.0,
+        default=0.17,
         help="Inner side-camera width skipped before b2d_mid stitching. Keep this fixed when increasing side crop width.",
     )
     parser.add_argument(

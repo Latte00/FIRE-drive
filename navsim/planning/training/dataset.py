@@ -331,6 +331,12 @@ class CacheOnlyDataset(torch.utils.data.Dataset):
             data_dict = load_feature_target_from_pickle(data_dict_path)
             features.update(data_dict)
 
+        # B2D navigation is an optional, compact sidecar so existing large
+        # camera/lidar caches can be extended without recompressing them.
+        navigation_path = token_path / "b2d_navigation_feature.gz"
+        if navigation_path.is_file():
+            features.update(load_feature_target_from_pickle(navigation_path))
+
         targets: Dict[str, torch.Tensor] = {}
         for builder in self._target_builders:
             data_dict_path = token_path / (builder.get_unique_name() + ".gz")

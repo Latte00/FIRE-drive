@@ -36,3 +36,4 @@ training_cache/
 
 *.log
 *.tmp
+!checkpoints/firedrive_b2d_navigation.ckpt

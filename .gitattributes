@@ -2,3 +2,4 @@
 checkpoints/FireDrive_riskattn64_single_gpu-915.ckpt filter=lfs diff=lfs merge=lfs -text
 *.npy binary
 *.png binary
+checkpoints/firedrive_b2d_navigation.ckpt filter=lfs diff=lfs merge=lfs -text

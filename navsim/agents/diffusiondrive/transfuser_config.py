@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass
+from dataclasses import dataclass
 from re import T
 from typing import Tuple, List, Optional
 from enum import Enum
@@ -632,6 +632,17 @@ class TransfuserConfig:
     #     milestones=[90],
     #     gamma=0.1,
     # )
+
+    b2d_navigation_enable: bool = False
+    b2d_navigation_require_features: bool = True
+    b2d_navigation_near_scale_m: float = 30.0
+    b2d_navigation_far_scale_m: float = 80.0
+    b2d_navigation_clip: float = 2.0
+    b2d_navigation_fuse_scale: float = 1.0
+    b2d_navigation_gate_bias: float = 1.0
+    b2d_navigation_ignore_behind_enable: bool = False
+    b2d_navigation_near_behind_tolerance_m: float = 1.0
+    b2d_navigation_far_behind_tolerance_m: float = 3.0
 
     @property
     def bev_semantic_frame(self) -> Tuple[int, int]:
